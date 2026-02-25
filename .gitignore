@@ -1,0 +1,15 @@
+.DS_Store
+.env
+src/.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Milvus / docker-compose runtime data (do NOT commit)
+volumes/
+
+# Local DB artifacts (keep only placeholder)
+data/db/*
+!data/db/.gitkeep

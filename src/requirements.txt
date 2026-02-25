@@ -1,0 +1,24 @@
+pymilvus[model] # vector database client + embedding model helpers (Milvus Lite is not supported on Windows)
+neo4j           # graph database
+neo4j_graphrag  # graph rag
+python-dotenv   # env variables
+lmstudio        # local llm client
+openai          # openai client
+sentence-transformers # local embeddings (free)
+pdfminer.six    # pdf
+PyPDF2          # pdf
+pymupdf4llm     # pdf to markdown
+docling         # chunking
+markdown-chunker # markdown to chunking
+deepdiff        # content differ
+groq            # groq client
+
+# Compatibility pin: several common scientific/NLP libs (e.g., gensim) still require NumPy < 2.0.
+# This prevents pip from pulling NumPy 2.x and ending up with an inconsistent environment.
+numpy==1.26.4
+
+# Required by neo4j_graphrag experimental pipeline (kg_builder)
+rapidfuzz
+
+# Required by neo4j_graphrag experimental pipeline resolver
+spacy>=3.7.0
