@@ -1,16 +1,16 @@
 import os
-from indexing.baseline_indexer import BaselineIndexer
-# from indexing.versionrag_indexer import VersionRAGIndexer
+from indexing.baseline.baseline_indexer import BaselineIndexer
+from indexing.versionrag.versionrag_indexer import VersionRAGIndexer
 # from indexing.kg_indexer import KnowledgeGraphIndexer
-from retrieval.baseline_retriever import BaselineRetriever
+from retrieval.baseline.baseline_retriever import BaselineRetriever
 # from retrieval.kg_retriever import KnowledgeGraphRetriever
-# from retrieval.versionrag_retriever import VersionRAGRetriever
-from generation.baseline_generator import BaselineGenerator
+from retrieval.versionrag.versionrag_retriever import VersionRAGRetriever
+from generation.baseline.baseline_generator import BaselineGenerator
 # from generation.kg_generator import KnowledgeGraphGenerator
-# from generation.versionrag_generator import VersionRAGGenerator
+from generation.versionrag.versionrag_generator import VersionRAGGenerator
 # from evaluation.evaluation import evaluate
 # from evaluation.evaluation_llm import judge_csv_file
-from util.constants import AVAILABLE_MODELS, BASELINE_MODEL
+from util.constants import AVAILABLE_MODELS, BASELINE_MODEL, VERSIONRAG_MODEL
 #  util.constants import AVAILABLE_MODELS, BASELINE_MODEL, KG_MODEL, VERSIONRAG_MODEL
 
 def get_user_choice(prompt, options):
@@ -81,10 +81,10 @@ def run_console_mode():
         #     indexer = KnowledgeGraphIndexer()
         #     retriever = KnowledgeGraphRetriever()
         #     generator = KnowledgeGraphGenerator()
-        # else:
-        #     indexer = VersionRAGIndexer()
-        #     retriever = VersionRAGRetriever()
-        #     generator = VersionRAGGenerator()
+        else:
+            indexer = VersionRAGIndexer()
+            retriever = VersionRAGRetriever()
+            generator = VersionRAGGenerator()
 
     # Execute the selected mode
     if mode == "Indexing":

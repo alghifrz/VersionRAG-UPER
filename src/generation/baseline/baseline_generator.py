@@ -1,4 +1,4 @@
-from generation.base_generator import BaseGenerator, Response
+from generation.baseline.base_generator import BaseGenerator, Response
 
 class BaselineGenerator(BaseGenerator):
     def generate(self, retrieved_data, query):        

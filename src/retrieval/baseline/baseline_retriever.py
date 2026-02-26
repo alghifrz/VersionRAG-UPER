@@ -1,4 +1,4 @@
-from retrieval.base_retriever import BaseRetriever, RetrievedData
+from retrieval.baseline.base_retriever import BaseRetriever, RetrievedData
 from pymilvus import MilvusClient
 from util.constants import MILVUS_URI, MILVUS_COLLECTION_NAME_BASELINE, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_BASELINE_SOURCE_COUNT
 from util.embedding_client import get_embedding_client
