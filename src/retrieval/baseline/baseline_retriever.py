@@ -17,6 +17,15 @@ class BaselineRetriever(BaseRetriever):
         if self.client is None:
             # self.client = MilvusClient(MILVUS_URI)
             self.client = get_milvus_client()
+
+        # Friendly behavior when the user hasn't indexed anything yet.
+        try:
+            if not self.client.has_collection(collection_name=MILVUS_COLLECTION_NAME_BASELINE):
+                return RetrievedData("no data indexed")
+        except Exception:
+            # If Milvus isn't reachable / misconfigured, let the caller surface a clear error.
+            # (We avoid swallowing the root cause here.)
+            raise
         
         query_vectors = self.embedding_fn.encode_queries([query])
 

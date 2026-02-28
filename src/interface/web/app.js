@@ -196,8 +196,15 @@ async function apiChat(model, message) {
     body: JSON.stringify({ model, message }),
   });
   if (!res.ok) {
-    const t = await res.text();
-    throw new Error(t || `HTTP ${res.status}`);
+    // Prefer FastAPI's JSON error shape: { detail: "..." }
+    try {
+      const j = await res.json();
+      const detail = j && (j.detail || j.message);
+      throw new Error(detail || JSON.stringify(j));
+    } catch (_) {
+      const t = await res.text();
+      throw new Error(t || `HTTP ${res.status}`);
+    }
   }
   return await res.json();
 }

@@ -1,4 +1,8 @@
-pymilvus[model] # vector database client + embedding model helpers (Milvus Lite is not supported on Windows)
+# Milvus client:
+# - Windows: Milvus Lite is NOT supported, so use server URI (e.g. http://localhost:19530)
+# - non-Windows (Linux/Render): enable Milvus Lite so we can use a local db file (data/db/milvus.db)
+pymilvus[model]; sys_platform == "win32"
+pymilvus[model,milvus-lite]; sys_platform != "win32"
 neo4j           # graph database
 neo4j_graphrag  # graph rag
 python-dotenv   # env variables

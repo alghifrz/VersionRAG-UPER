@@ -163,6 +163,42 @@ def _strip_answer_prefix(text: str) -> str:
     return s
 
 
+# ---- Friendly error formatting ----------------------------------------------
+def _format_chat_exception(e: Exception) -> str:
+    """
+    Convert common deployment misconfigurations into a readable message.
+    This is especially helpful on hosted platforms where a long/hung request
+    may otherwise show up as a generic 502 page.
+    """
+    msg = f"{type(e).__name__}: {e}"
+    lower = msg.lower()
+
+    hints: list[str] = []
+
+    if "openai_api_key" in lower or "api key" in lower and "openai" in lower:
+        hints.append("Set `OPENAI_API_KEY` (or switch `EMBEDDING_PROVIDER=local`) for embeddings.")
+        hints.append("If you use Groq for chat, also set `LLM_MODE=groq` + `GROQ_API_KEY`.")
+
+    if "groq_api_key" in lower or ("api key" in lower and "groq" in lower):
+        hints.append("Set `GROQ_API_KEY` and (optionally) `GROQ_MODEL`.")
+
+    if "neo4j_uri" in lower or "neo4j_user" in lower or "neo4j_password" in lower:
+        hints.append("For VersionRAG, set `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` (Neo4j Aura may be paused).")
+
+    if "milvus" in lower or "zilliz" in lower:
+        hints.append("Set `MILVUS_URI` (and `MILVUS_TOKEN` if using Zilliz Cloud).")
+        hints.append("On Linux/Render you can use Milvus Lite (local file) with `pymilvus[... ,milvus-lite]`.")
+
+    if "collection" in lower and "not found" in lower:
+        hints.append("It looks like you haven't indexed yet. Run Indexing first, then chat again.")
+
+    if not hints:
+        return msg
+
+    hint_text = "\n".join(f"- {h}" for h in hints)
+    return f"{msg}\n\nPossible fix:\n{hint_text}"
+
+
 # ---- Background indexing jobs ----------------------------------------------
 _jobs_lock = Lock()
 _jobs: Dict[str, Dict[str, Any]] = {}
@@ -321,23 +357,29 @@ def health() -> Dict[str, Any]:
 
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
-    comps = _get_components(req.model)
-    retriever = comps["retriever"]
-    generator = comps["generator"]
+    try:
+        comps = _get_components(req.model)
+        retriever = comps["retriever"]
+        generator = comps["generator"]
 
-    retrieved = retriever.retrieve(req.message)
-    response = generator.generate(retrieved, req.message)
-    answer_text = getattr(response, "answer", None)
-    if not isinstance(answer_text, str) or not answer_text.strip():
-        answer_text = str(response)
-    answer_text = _strip_answer_prefix(answer_text)
+        retrieved = retriever.retrieve(req.message)
+        response = generator.generate(retrieved, req.message)
+        answer_text = getattr(response, "answer", None)
+        if not isinstance(answer_text, str) or not answer_text.strip():
+            answer_text = str(response)
+        answer_text = _strip_answer_prefix(answer_text)
 
-    return ChatResponse(
-        model=req.model if req.model in (BASELINE_MODEL, VERSIONRAG_MODEL) else (BASELINE_MODEL if req.model.lower() == "baseline" else VERSIONRAG_MODEL),
-        answer=answer_text,
-        context=_retrieved_context_to_string(retrieved),
-        meta={},
-    )
+        return ChatResponse(
+            model=req.model if req.model in (BASELINE_MODEL, VERSIONRAG_MODEL) else (BASELINE_MODEL if req.model.lower() == "baseline" else VERSIONRAG_MODEL),
+            answer=answer_text,
+            context=_retrieved_context_to_string(retrieved),
+            meta={},
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Convert to a readable error and use 503 to signal "dependency/config not ready".
+        raise HTTPException(status_code=503, detail=_format_chat_exception(e))
 
 
 @app.post("/api/index", response_model=IndexStartResponse)

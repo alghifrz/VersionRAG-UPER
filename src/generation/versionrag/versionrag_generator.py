@@ -23,6 +23,7 @@ class VersionRAGGenerator(BaseGenerator):
             """
     
     def generate(self, retrieved_data, query):        
-        user_prompt = f"Question: {query}\n\nRetrieved Data:\n{retrieved_data}"
+        context = self.render_context(retrieved_data)
+        user_prompt = f"Question: {query}\n\nRetrieved Data:\n{context}"
         llm_response = self.llm_client.generate(system_prompt=self.system_prompt, user_prompt=user_prompt)
         return Response(answer=llm_response)

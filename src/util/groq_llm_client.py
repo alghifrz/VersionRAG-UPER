@@ -20,6 +20,7 @@ class GROQLLM(LLMInterface):
         self.model = model or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
         self.temp = temp
         self.response_format_json = response_format_json
+        self.max_completion_tokens = int(os.getenv("LLM_MAX_COMPLETION_TOKENS", "512"))
 
     def _build_kwargs(self, input: str, system_prompt: str = None):
         messages = []
@@ -43,6 +44,10 @@ class GROQLLM(LLMInterface):
 
         if self.response_format_json:
             kwargs["response_format"] = {"type": "json_object"}
+
+        # Groq uses `max_tokens` (not `max_completion_tokens`).
+        if self.max_completion_tokens and self.max_completion_tokens > 0:
+            kwargs["max_tokens"] = self.max_completion_tokens
 
         return kwargs
 

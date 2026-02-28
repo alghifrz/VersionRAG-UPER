@@ -12,9 +12,12 @@ class LLMClient:
     def __init__(self, json_format=False, temp=None):
         self.temp = temp
         self.json_format = json_format
+        self.max_completion_tokens = int(os.getenv("LLM_MAX_COMPLETION_TOKENS", "512"))
         
         if LLM_MODE == 'openai':
-            self.client = OpenAI()
+            # Allow customizing request timeout for hosted environments.
+            timeout_s = float(os.getenv("OPENAI_TIMEOUT", "60"))
+            self.client = OpenAI(timeout=timeout_s)
         elif LLM_MODE == 'groq':
             self.client = GROQLLM(response_format_json=json_format, temp=temp)
         else:
@@ -32,7 +35,7 @@ class LLMClient:
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
-                ]
+                ],
             }
 
             if self.temp is not None:
@@ -40,6 +43,10 @@ class LLMClient:
 
             if self.json_format:
                 kwargs["response_format"] = {"type": "json_object"}
+
+            # Keep completions bounded to reduce latency and avoid gateway timeouts.
+            if self.max_completion_tokens and self.max_completion_tokens > 0:
+                kwargs["max_completion_tokens"] = self.max_completion_tokens
                 
             response = self.client.chat.completions.create(**kwargs)
             return response.choices[0].message.content
