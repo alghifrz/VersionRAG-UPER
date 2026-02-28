@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LexUP - Universitas Pertamina Legal & Regulation Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <!-- Favicon: must be served from /static (FastAPI StaticFiles mount) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icon.png?v=1">
+    <link rel="shortcut icon" href="/static/icon.png?v=1">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-content">
+          <div class="brand">
+            <div>
+              <img id="brandLogo" src="/static/logo.png" alt="UPER Logo" class="brand-logo">
+            </div>
+            <div class="brand-subtitle">Universitas Pertamina Legal & Regulation Assistant</div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Indexing</div>
+            <button id="indexBaselineBtn" class="btn btn-secondary">Baseline</button>
+            <button id="indexVersionBtn" class="btn btn-secondary">VersionRAG</button>
+            <div id="indexProgressWrap" class="progress-wrap hidden" aria-label="Index progress">
+              <div class="progress-bar">
+                <div id="indexProgressFill" class="progress-fill indeterminate"></div>
+              </div>
+            </div>
+
+            <details id="indexLogsWrap" class="logs-details hidden">
+              <summary class="logs-summary">Logs</summary>
+              <pre id="indexLogs" class="logs" aria-label="Index logs"></pre>
+            </details>
+
+            <div id="indexStatus" class="status hidden" aria-label="Index status"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Tips</div>
+            <ul class="tips">
+              <li>Pastikan melakukan indexing terlebih dahulu sebelum melakukan chat.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-footer" aria-label="Copyright">
+          © <span id="copyrightYear">2026</span> AGRAZ. Kunjungi <a href="https://alghifrz.me" target="_blank">alghifrz.me</a>
+        </div>
+      </aside>
+
+      <main class="main is-empty" id="main">
+        <div class="theme-toggle" aria-label="Theme toggle">
+          <span class="theme-label">Theme</span>
+          <label class="switch" title="Toggle dark/light">
+            <input id="themeToggle" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <section class="modelbar" aria-label="Model selector">
+          <div class="modelbar-inner">
+            <!-- Keep a real <select> (hidden) as the source-of-truth value -->
+            <select id="modelSelect" class="model-native-select" aria-label="Select model">
+              <option value="Baseline">Baseline Model</option>
+              <option value="VersionRAG">VersionRAG Model</option>
+            </select>
+
+            <!-- Custom dropdown (fully stylable) -->
+            <div class="model-dropdown" id="modelDropdown" aria-label="Model dropdown">
+              <button
+                id="modelTrigger"
+                class="model-trigger"
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+              >
+                Baseline Model
+                <span class="model-caret" aria-hidden="true"></span>
+              </button>
+              <div id="modelMenu" class="model-menu hidden" role="listbox" aria-label="Model options">
+                <button class="model-item" type="button" role="option" data-value="Baseline">
+                  Baseline Model
+                </button>
+                <button class="model-item" type="button" role="option" data-value="VersionRAG">
+                  VersionRAG Model
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="emptyState" class="empty-state" aria-label="Empty state">
+          <div class="empty-title">Halo! Apa yang ingin kamu tanyakan?</div>
+          <div class="empty-subtitle">
+            Pilih model di atas, lalu mulai tanya. Kalau data belum di-index, klik tombol Index dulu.
+          </div>
+          <div id="emptyComposerHost" class="empty-composer-host" aria-label="Empty composer host"></div>
+          <!-- <button id="clearBtn" class="btn btn-ghost clear-empty" type="button">Clear</button> -->
+        </section>
+
+        <section id="chat" class="chat" aria-label="Chat messages"></section>
+
+        <footer class="composer">
+          <form id="chatForm" class="composer-form">
+            <textarea
+              id="messageInput"
+              class="composer-input"
+              placeholder="Tulis pertanyaanmu…"
+              rows="1"
+            ></textarea>
+            <button id="sendBtn" class="btn btn-primary" type="submit">Kirim</button>
+          </form>
+          <div class="composer-help">
+            AI dapat membuat kesalahan. Periksa kembali informasi penting
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
+
+

@@ -28,6 +28,7 @@ MILVUS_DB_PATH = str(_DATA_DB_DIR / "milvus.db")  # kept for backward-compat / n
 MILVUS_URI = os.getenv("MILVUS_URI")
 if not MILVUS_URI:
     MILVUS_URI = "http://localhost:19530" if sys.platform == "win32" else MILVUS_DB_PATH
+MILVUS_TOKEN = os.getenv("MILVUS_TOKEN", "").strip()
 MILVUS_COLLECTION_NAME_BASELINE = "baseline_collection"
 MILVUS_COLLECTION_NAME_VERSIONRAG = "VersionRAG_collection"
 MILVUS_MAX_TOKEN_COUNT = 512 # Maximum tokens per chunk

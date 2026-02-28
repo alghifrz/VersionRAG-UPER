@@ -1,7 +1,9 @@
 from retrieval.baseline.base_retriever import BaseRetriever, RetrievedData
-from pymilvus import MilvusClient
-from util.constants import MILVUS_URI, MILVUS_COLLECTION_NAME_BASELINE, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_BASELINE_SOURCE_COUNT
+# from pymilvus import MilvusClient
+# from util.constants import MILVUS_URI, MILVUS_COLLECTION_NAME_BASELINE, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_BASELINE_SOURCE_COUNT
+from util.constants import MILVUS_COLLECTION_NAME_BASELINE, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_BASELINE_SOURCE_COUNT
 from util.embedding_client import get_embedding_client
+from util.milvus_client_factory import get_milvus_client
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,7 +15,8 @@ class BaselineRetriever(BaseRetriever):
 
     def retrieve(self, query):
         if self.client is None:
-            self.client = MilvusClient(MILVUS_URI)
+            # self.client = MilvusClient(MILVUS_URI)
+            self.client = get_milvus_client()
         
         query_vectors = self.embedding_fn.encode_queries([query])
 

@@ -3,8 +3,10 @@ from indexing.versionrag.versionrag_indexer_graph import VersionRAGIndexerGraph
 from indexing.versionrag.versionrag_indexer_extract_attributes import extract_attributes_from_file
 from indexing.versionrag.versionrag_indexer_clustering import cluster_documentation
 from util.chunker import Chunk
-from util.constants import MILVUS_COLLECTION_NAME_VERSIONRAG, MILVUS_META_ATTRIBUTE_TYPE, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_URI
-from pymilvus import MilvusClient
+# from util.constants import MILVUS_COLLECTION_NAME_VERSIONRAG, MILVUS_META_ATTRIBUTE_TYPE, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_URI
+# from pymilvus import MilvusClient
+from util.constants import MILVUS_COLLECTION_NAME_VERSIONRAG, MILVUS_META_ATTRIBUTE_TYPE, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION
+from util.milvus_client_factory import get_milvus_client
 
 class VersionRAGIndexer(BaseIndexer):
     def __init__(self):
@@ -71,7 +73,8 @@ class VersionRAGIndexer(BaseIndexer):
                 # Query to check if changes exist for this version
                 try:
                     if self.client is None:
-                        self.client = MilvusClient(MILVUS_URI)
+                        # self.client = MilvusClient(MILVUS_URI)
+                        self.client = get_milvus_client()
                     # Escape strings for Milvus filter
                     escaped_doc = change_node["documentation"].replace('\\', '\\\\').replace('"', '\\"')
                     escaped_version = change_node["version"].replace('\\', '\\\\').replace('"', '\\"')

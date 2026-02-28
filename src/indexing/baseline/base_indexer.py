@@ -1,10 +1,12 @@
 import os
 import time
 from dotenv import load_dotenv
-from pymilvus import MilvusClient
-from util.constants import MILVUS_URI, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_META_ATTRIBUTE_CATEGORY, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_META_ATTRIBUTE_TYPE, EMBEDDING_DIMENSIONS
+# from pymilvus import MilvusClient
+# from util.constants import MILVUS_URI, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_META_ATTRIBUTE_CATEGORY, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_META_ATTRIBUTE_TYPE, EMBEDDING_DIMENSIONS
+from util.constants import MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_META_ATTRIBUTE_CATEGORY, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_META_ATTRIBUTE_TYPE, EMBEDDING_DIMENSIONS
 from util.chunker import Chunker, Chunk
 from util.embedding_client import get_embedding_client
+from util.milvus_client_factory import get_milvus_client
 
 load_dotenv()
 
@@ -19,7 +21,8 @@ class BaseIndexer:
     
     def createCollectionIfRequired(self, collection_name):
         if self.client is None:
-            self.client = MilvusClient(MILVUS_URI)
+            # self.client = MilvusClient(MILVUS_URI)
+            self.client = get_milvus_client()
         
         if not self.client.has_collection(collection_name=collection_name):
             self.client.create_collection(
@@ -46,7 +49,8 @@ class BaseIndexer:
         Returns True if file exists, False otherwise.
         """
         if self.client is None:
-            self.client = MilvusClient(MILVUS_URI)
+            # self.client = MilvusClient(MILVUS_URI)
+            self.client = get_milvus_client()
         
         if not self.client.has_collection(collection_name=collection_name):
             return False
@@ -74,7 +78,8 @@ class BaseIndexer:
         Useful for re-indexing a file.
         """
         if self.client is None:
-            self.client = MilvusClient(MILVUS_URI)
+            # self.client = MilvusClient(MILVUS_URI)
+            self.client = get_milvus_client()
         
         if not self.client.has_collection(collection_name=collection_name):
             return

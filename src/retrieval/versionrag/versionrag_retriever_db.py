@@ -1,10 +1,12 @@
 from enum import Enum
 from util.graph_client import GraphClient
 from util.llm_client import LLMClient
-from pymilvus import MilvusClient
+# from pymilvus import MilvusClient
 from retrieval.baseline.base_retriever import RetrievedData
-from util.constants import MILVUS_URI, MILVUS_COLLECTION_NAME_VERSIONRAG, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_META_ATTRIBUTE_CATEGORY, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_META_ATTRIBUTE_TYPE
+# from util.constants import MILVUS_URI, MILVUS_COLLECTION_NAME_VERSIONRAG, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_META_ATTRIBUTE_CATEGORY, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_META_ATTRIBUTE_TYPE
+from util.constants import MILVUS_COLLECTION_NAME_VERSIONRAG, MILVUS_META_ATTRIBUTE_TEXT, MILVUS_META_ATTRIBUTE_PAGE, MILVUS_META_ATTRIBUTE_FILE, MILVUS_META_ATTRIBUTE_CATEGORY, MILVUS_META_ATTRIBUTE_DOCUMENTATION, MILVUS_META_ATTRIBUTE_VERSION, MILVUS_META_ATTRIBUTE_TYPE
 from util.embedding_client import get_embedding_client
+from util.milvus_client_factory import get_milvus_client
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -22,7 +24,8 @@ class VersionRAGRetrieverDatabase:
     def __init__(self):
         self.graph = GraphClient()
         self.llm_client = LLMClient()
-        self.vdb = MilvusClient(MILVUS_URI)
+        # self.vdb = MilvusClient(MILVUS_URI)
+        self.vdb = get_milvus_client()
         self.vdb_embedding = get_embedding_client()
 
     def retrieve(self, params: RetrievalParam) -> RetrievedData:

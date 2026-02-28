@@ -5,6 +5,7 @@ import json
 from pdfminer.high_level import extract_text
 from deepdiff import DeepDiff
 import time
+import re
 
 llm_client = LLMClient(json_format=True, temp=0.0)
 chunker = Chunker()
@@ -98,6 +99,29 @@ def extract_changes_from_changelog(changelog_content) -> list[Change]:
 
 
 # todo: put into own py file
+def _normalize_text_for_diff(text: str) -> list[str]:
+    """
+    Normalize text before running DeepDiff so that purely formatting-related
+    differences (whitespace, blank lines, minor spacing) are minimized.
+
+    - Strip leading/trailing whitespace
+    - Collapse multiple internal whitespace into a single space
+    - Drop empty lines
+    """
+    lines = text.splitlines()
+    normalized_lines = []
+    for line in lines:
+        # Trim leading/trailing whitespace
+        stripped = line.strip()
+        if not stripped:
+            # Drop completely empty / whitespace-only lines
+            continue
+        # Collapse multiple spaces/tabs into single space
+        collapsed = re.sub(r"\s+", " ", stripped)
+        normalized_lines.append(collapsed)
+    return normalized_lines
+
+
 def generate_changes_from_diff(contents_to_diff) -> list[Change]:
     system_prompt = """You are an intelligent assistant tasked with creating a structured and comprehensive change log based on a list of document changes.
 
@@ -164,7 +188,17 @@ def generate_changes_from_diff(contents_to_diff) -> list[Change]:
         file1_content = read_file_content(file1)
         file2_content = read_file_content(file2)
 
-        diff = DeepDiff(file1_content.splitlines(), file2_content.splitlines(), verbose_level=2, ignore_order=True)
+        # Normalize text to reduce noise from formatting-only changes
+        file1_lines = _normalize_text_for_diff(file1_content)
+        file2_lines = _normalize_text_for_diff(file2_content)
+
+        diff = DeepDiff(file1_lines, file2_lines, verbose_level=2, ignore_order=True)
+
+        # If there is no actual difference after normalization, skip this pair
+        if not diff:
+            print("No meaningful diff detected after normalization, skipping change generation for this pair.")
+            continue
+
         diff_json = diff.to_json(indent=2)
         max_attempts = 3
         for attempt in range(max_attempts):
